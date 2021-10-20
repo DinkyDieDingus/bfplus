@@ -76,4 +76,8 @@ if __name__ == '__main__':
             i += 1
         f.write('    return 0;\n}\n')
 
-    os.system('gcc ' + filename + '.c -o ' + filename + '.out')
+    prog = 'a.out'
+    if filename != 'a':
+        prog = filename
+        
+    os.system('gcc ' + filename + '.c -o ' + prog)

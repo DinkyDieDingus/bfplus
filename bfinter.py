@@ -7,20 +7,10 @@ from bfdebug import Debugger
 
 debug = False
 
-if __name__ == '__main__':
-
-    if len(sys.argv) > 2:
-        if sys.argv[2] == 'true':
-            debug = True
-
-    data = [0]
-    ptr = 0
-    stack = []
-    debug_info = []
+def loadInstructions(debug):
     instructions = []
+    debug_info = []
     with open(sys.argv[1]) as f:
-        #instructions = f.read()
-        #instructions = re.sub(r'[^\>\<\+\-|.\,\[\]]','',instructions)
         line = 1
         col = 1
         while True:
@@ -36,6 +26,19 @@ if __name__ == '__main__':
                 if char == '\n':
                     line += 1
                     col = 1
+    return (instructions, debug_info)
+
+if __name__ == '__main__':
+
+    if len(sys.argv) > 2:
+        if sys.argv[2] == 'true':
+            debug = True
+
+    data = [0]
+    ptr = 0
+    stack = []
+
+    instructions, debug_info = loadInstructions(debug)
 
     if debug:
         debugger = Debugger(instructions, debug_info)
