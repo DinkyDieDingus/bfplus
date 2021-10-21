@@ -1,20 +1,18 @@
 
-from debug import Debugger
 import os
+from debug import Debugger
+from executor import Executor
 
-class Interpreter:
+class Interpreter(Executor):
     def __init__(self, instructions, debug=False, debug_info=None):
+        super().__init__(instructions)
         self.data = [0]
         self.ptr = 0
         self.stack = []
         self.debug_info = debug_info
-        self.instructions = instructions
         self.debug = debug
         if (self.debug):
             self.debugger = Debugger(self.instructions, self.debug_info)
-
-    def finish(self):
-        pass
 
     def beforeInstr(self, i):
         if self.debug:
@@ -66,7 +64,7 @@ class Interpreter:
 
     def loopEnd(self, i):
         if self.data[self.ptr] != 0:
-            i = self.stack[len(self.stack) - 1]
+            i = self.stack[-1]
         else:
-            self.stack.pop(len(self.stack) - 1)
+            self.stack.pop(-1)
         return i

@@ -7,16 +7,20 @@ class Debugger:
         self.clearMode = clearMode
         self.prev_instr = ''
         self.breakpoints = [0]
+        self.awaiting_next = False
         self.data_window_size = data_window_size
         self.instr_window_size = instr_window_size
         self.show_instr_per_line = show_instr_per_line
         self.show_line_nums = show_line_nums
 
     def run(self, ptr, data, i):
-        if i not in self.breakpoints:
-            return
-        else:
+        if i in self.breakpoints:
             self.breakpoints.pop(self.breakpoints.index(i))
+        else:
+            if not self.awaiting_next:
+                return
+        self.awaiting_next = False
+            
         if self.clearMode:
             #pass
             os.system('clear')
@@ -55,7 +59,7 @@ class Debugger:
             cmd = split[0]
             args = split[1:]
             if cmd == 'n':
-                self.breakpoints.append(i + 1)
+                self.awaiting_next = True
             elif cmd == 's':
                 start = 0
                 if len(args) >= 1:

@@ -3,3 +3,5 @@ testing
 __pycache__
 *.c
 *.out
+*.asm
+.gdb_history
