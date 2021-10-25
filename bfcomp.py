@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import argparse
-from compiler import CCompiler, AsmCompiler
-import processor
+from src.compiler import CCompiler, AsmCompiler
+import src.processor as processor
 
 if __name__ == '__main__':
 

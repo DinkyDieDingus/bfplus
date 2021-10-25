@@ -1,5 +1,5 @@
 import os
-from executor import Executor
+from src.executor import Executor
 
 class CCompiler(Executor):
     def __init__(self, instructions, filename, compile_bin, binname):

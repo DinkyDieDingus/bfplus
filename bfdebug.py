@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import argparse
-from interpreter import Interpreter
-import processor
+from src.interpreter import Interpreter
+import src.processor as processor
 
 if __name__ == '__main__':
 

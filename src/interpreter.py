@@ -1,7 +1,7 @@
 
 import os
-from debug import Debugger
-from executor import Executor
+from src.debug import Debugger
+from src.executor import Executor
 
 class Interpreter(Executor):
     def __init__(self, instructions, debug=False, debug_info=None):
