@@ -1,3 +1,3 @@
 
 make clean:
-	rm -f *.o *.out *.asm
+	rm -f *.c *.o *.out *.asm
