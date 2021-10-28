@@ -9,6 +9,7 @@ class AsmCompiler(Executor):
         self.pad = '    '
         self.file.write('global _start\n\nsection .text\n_start:\n' + self.pad + "mov byte [rsp], 0x0\n")
         self.stack = []
+        self.labels = []
         self.compile = compile_bin
         self.binname = binname
 
@@ -55,10 +56,10 @@ class AsmCompiler(Executor):
         return i
 
     def loopStart(self, i):
-        if len(self.stack) == 0:
+        if len(self.labels) == 0:
             nxt = 'a'
         else:
-            prev = self.stack[-1]
+            prev = self.labels[-1]
             lastchar = prev[-1]
             if lastchar == 'z':
                 nxt = prev + 'a'
@@ -66,13 +67,14 @@ class AsmCompiler(Executor):
                 nxt = prev[:-1] + chr(ord(lastchar) + 1)
         
         self.stack.append(nxt)
+        self.labels.append(nxt)
         self.file.write(self.pad + 'cmp byte [rsp], 0x0\n')
         self.file.write(self.pad + f'je {nxt}_end\n')
         self.file.write(nxt + ':\n')
         return i
 
     def loopEnd(self, i):
-        prev = self.stack[-1]
+        prev = self.stack.pop()
         self.file.write(self.pad + 'cmp BYTE [rsp], 0x0\n')
         self.file.write(self.pad + f'jne {prev}\n')
         self.file.write(prev + '_end:\n')
