@@ -4,4 +4,6 @@ __pycache__
 *.c
 *.out
 *.asm
+*.txt
+*.o
 .gdb_history
