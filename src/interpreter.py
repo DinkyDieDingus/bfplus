@@ -4,11 +4,13 @@ from src.debug import Debugger
 from src.executor import Executor
 
 class Interpreter(Executor):
-    def __init__(self, instructions, debug=False, debug_info=None):
+    def __init__(self, instructions, byte_input=False, byte_output=False, debug=False, debug_info=None):
         super().__init__(instructions)
         self.data = [0]
         self.ptr = 0
         self.stack = []
+        self.byte_input = byte_input
+        self.byte_output = byte_output
         self.debug_info = debug_info
         self.debug = debug
         if (self.debug):
@@ -42,7 +44,10 @@ class Interpreter(Executor):
         if self.debug:
             os.system('clear')
             print('program output:')
-        print(chr(self.data[self.ptr]), end='')
+        if not self.byte_output:
+            print(chr(self.data[self.ptr]), end='')
+        else:
+            print(self.data[self.ptr], end='')
         if self.debug:
             input()
         return i
@@ -51,7 +56,10 @@ class Interpreter(Executor):
         if self.debug:
             os.system('clear')
             print('program input:')
-        self.data[self.ptr] = ord(input()[0])
+        if not self.byte_input:
+            self.data[self.ptr] = ord(input()[0])
+        else:
+            self.data[self.ptr] = int(input())
         return i
 
     def loopStart(self, i):
