@@ -1,10 +1,13 @@
 import os
 from src.executor import Executor
 
+
+
 class BinCompiler(Executor):
-    def __init__(self, instructions, binname):
+    def __init__(self, instructions, binname, debug):
         super().__init__(instructions)
         self.binname = binname
+        self.debug = debug
 
         self.loopStarts = []
         self.text = bytearray(b'\xc6\x04\x24\x00')
@@ -72,32 +75,36 @@ class BinCompiler(Executor):
 
         # get the beginning of the loop
         start = self.loopStarts.pop()
-        print(f'start = {hex(start)}')
+        self.log(f'start = {hex(start)}')
+
         # get the number of instructions previous it was
         start_rel_pos = len(self.text) - start + 2
-        print(f'diff  = {start_rel_pos}')
-        print(f'dihex = {hex(start_rel_pos)}')
+        self.log(f'diff  = {start_rel_pos}')
+        self.log(f'dihex = {hex(start_rel_pos)}')
         # convert that number into negative signed 8-bit hex
-        start_rel_pos_hex = twos_compliment(start_rel_pos)
-        print(f'dineg = {hex(start_rel_pos_hex)}')
-        print(f'bytes = {start_rel_pos_hex.to_bytes(1, "big")}')
+        start_rel_pos_hex = self.twos_compliment(start_rel_pos)
+        self.log(f'dineg = {hex(start_rel_pos_hex)}')
+        self.log(f'bytes = {start_rel_pos_hex.to_bytes(1, "big")}')
         # write jne to that address
         self.text += b'\x75' + start_rel_pos_hex.to_bytes(1, 'big')
         
         end = len(self.text) 
-        print(f'end   = {hex(end)}\n')
+        self.log(f'end   = {hex(end)}\n')
         self.text[start - 1] = end - start
 
         return i
 
+    def log(self, i):
+        if self.debug:
+            print(i)
 
-def twos_compliment(num):
-    print(bin(num)[2:].rjust(8,'0'))
-    comp = num ^ 0b11111111
-    print(bin(comp)[2:].rjust(8,'0'))
-    res = comp + 1
-    print(bin(res)[2:].rjust(8,'0'))
-    return res
+    def twos_compliment(self, num):
+        self.log(bin(num)[2:].rjust(8,'0'))
+        comp = num ^ 0b11111111
+        self.log(bin(comp)[2:].rjust(8,'0'))
+        res = comp + 1
+        self.log(bin(res)[2:].rjust(8,'0'))
+        return res
 
 def get_elf_header(text_size):
     # ELF Header

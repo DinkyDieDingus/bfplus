@@ -12,6 +12,7 @@ if __name__ == '__main__':
     parser.add_argument('-l', help='Language to compile to', dest='language', default='c', choices=['c', 'asm', 'bin'])
     parser.add_argument('-o', help='Name of compiled file', dest='cname', default=None)
     parser.add_argument('-c', help='Whether to use external compiler to compile to binary file', dest='binname', nargs='?', default=False)
+    parser.add_argument('-d', help='Print compiler debugging information', dest='internal_debug', action='store_true')
 
     args = parser.parse_args()
 
@@ -34,6 +35,6 @@ if __name__ == '__main__':
     elif args.language == 'asm':
         executor = AsmCompiler(instructions, cname, compile, binname) 
     elif args.language == 'bin':
-        executor = BinCompiler(instructions, binname)
+        executor = BinCompiler(instructions, binname, args.internal_debug)
  
     processor.process(instructions, executor)
