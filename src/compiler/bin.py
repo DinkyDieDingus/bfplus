@@ -62,7 +62,7 @@ class BinCompiler(Executor):
         # check ptr is 0
         self.text += b'\x80\x3c\x24\x00'
         # jump to end of loop if so
-        self.text += b'\x74\x00' # leave 0x00 at end to fill in later
+        #self.text += b'\x74' # leave rel8 empty for now
         # bookmark beginning
         self.loopStarts.append(len(self.text))
 
@@ -78,19 +78,40 @@ class BinCompiler(Executor):
         self.log(f'start = {hex(start)}')
 
         # get the number of instructions previous it was
-        start_rel_pos = len(self.text) - start + 2
-        self.log(f'diff  = {start_rel_pos}')
-        self.log(f'dihex = {hex(start_rel_pos)}')
-        # convert that number into negative signed 8-bit hex
-        start_rel_pos_hex = self.twos_compliment(start_rel_pos)
-        self.log(f'dineg = {hex(start_rel_pos_hex)}')
-        self.log(f'bytes = {start_rel_pos_hex.to_bytes(1, "big")}')
-        # write jne to that address
-        self.text += b'\x75' + start_rel_pos_hex.to_bytes(1, 'big')
+        diff = len(self.text) - start + 2
         
-        end = len(self.text) 
-        self.log(f'end   = {hex(end)}\n')
-        self.text[start - 1] = end - start
+        if diff < 127:
+            start_rel_pos = diff
+            self.log(f'diff  = {start_rel_pos}')
+            self.log(f'dihex = {hex(start_rel_pos)}')
+
+            # convert that number into negative signed 8-bit hex
+            start_rel_pos_hex = twos_compliment(start_rel_pos)
+            self.log(f'dineg = {hex(start_rel_pos_hex)}')
+            self.log(f'bytes = {start_rel_pos_hex.to_bytes(1, "little")}')
+
+            # write jne to that address
+            self.text += b'\x75' + start_rel_pos_hex.to_bytes(1, 'little')
+            
+            end = len(self.text) 
+            self.log(f'end   = {hex(end)}\n')
+            self.text[start:start] = b'\x74' + (end - start).to_bytes(1, 'little')
+        else:
+            start_rel_pos = diff + 4
+            self.log(f'diff  = {start_rel_pos}')
+            self.log(f'dihex = {hex(start_rel_pos)}')
+
+            # convert that number into negative signed 8-bit hex
+            start_rel_pos_hex = twos_compliment32(start_rel_pos)
+            self.log(f'dineg = {hex(start_rel_pos_hex)}')
+            self.log(f'bytes = {start_rel_pos_hex.to_bytes(4, "little")}')
+
+            # write jne to that address
+            self.text += b'\x0f\x85' + start_rel_pos_hex.to_bytes(4, 'little')
+            
+            end = len(self.text) 
+            self.log(f'end   = {hex(end)}\n')
+            self.text[start:start] = b'\x0f\x84' + (end - start).to_bytes(4, 'little')
 
         return i
 
@@ -98,13 +119,15 @@ class BinCompiler(Executor):
         if self.debug:
             print(i)
 
-    def twos_compliment(self, num):
-        self.log(bin(num)[2:].rjust(8,'0'))
-        comp = num ^ 0b11111111
-        self.log(bin(comp)[2:].rjust(8,'0'))
-        res = comp + 1
-        self.log(bin(res)[2:].rjust(8,'0'))
-        return res
+def twos_compliment(num):
+    comp = num ^ 0b11111111
+    res = comp + 1
+    return res
+
+def twos_compliment32(num):
+    comp = num ^ 0xffffffff
+    res = comp + 1
+    return res
 
 def get_elf_header(text_size):
     # ELF Header
