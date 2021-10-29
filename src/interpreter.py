@@ -14,7 +14,7 @@ class Interpreter(Executor):
         self.debug_info = debug_info
         self.debug = debug
         if (self.debug):
-            self.debugger = Debugger(self.instructions, self.debug_info)
+            self.debugger = Debugger(self.instructions, self.debug_info, self.stack)
 
     def beforeInstr(self, i):
         if self.debug:
@@ -74,5 +74,5 @@ class Interpreter(Executor):
         if self.data[self.ptr] != 0:
             i = self.stack[-1]
         else:
-            self.stack.pop(-1)
+            self.stack.pop()
         return i

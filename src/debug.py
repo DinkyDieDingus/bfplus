@@ -1,9 +1,10 @@
 import os
 
 class Debugger:
-    def __init__(self, instructions, debug_info, show_line_nums=True, clearMode=True, data_window_size=10, instr_window_size=10, show_instr_per_line=4):
+    def __init__(self, instructions, debug_info, stack, show_line_nums=True, clearMode=True, data_window_size=10, instr_window_size=10, show_instr_per_line=4):
         self.instructions = instructions
         self.info = debug_info
+        self.stack = stack
         self.clearMode = clearMode
         self.prev_instr = ''
         self.breakpoints = [0]
@@ -24,6 +25,7 @@ class Debugger:
         if self.clearMode:
             #pass
             os.system('clear')
+
         d_snip_start = max(0, ptr - self.data_window_size)
         d_snip_end = min(len(data), ptr + self.data_window_size)
         d_snip = data[d_snip_start : d_snip_end + 1]
@@ -32,6 +34,8 @@ class Debugger:
             print(' ^')
         else:
             print(' '*(len(str(data[d_snip_start : ptr]))+1) + '^')
+
+        print(f'Loop Depth: {len(self.stack)}\n')
 
         i_snip_start = max(0, i - self.instr_window_size)
         i_snip_end = min(len(self.instructions), i_snip_start + (2 * self.instr_window_size))
