@@ -1,4 +1,7 @@
 #!/bin/bash
+# Uses generated reports (from make test) to confirm that the produced handmade binary matches
+# binary produced by nasm
+
 diff=0
 cut -c11- asm_hex.txt > cut_asm_hex.txt
 cut -c11- bin_hex.txt > cut_bin_hex.txt
